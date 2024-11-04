@@ -31,10 +31,10 @@ class lloom:
         df: pd.DataFrame,
         text_col: str,
         id_col: str = None,
-        distill_model_name = "gpt-3.5-turbo",
-        embed_model_name = "text-embedding-3-large",
-        synth_model_name = "gpt-4-turbo",
-        score_model_name = "gpt-3.5-turbo",
+        distill_model_name = "llama3.1",
+        embed_model_name = "nomic-embed-text",
+        synth_model_name = "llama3.1",
+        score_model_name = "llama3.1",
         rate_limits = {}, # D_i = "model-name": (n_requests, wait_time_secs)
         debug: bool = False,
     ):
@@ -82,9 +82,6 @@ class lloom:
             "out_tokens": [],
         }
 
-        # Check for API key
-        if "OPENAI_API_KEY" not in os.environ:
-            raise Exception("API key not found. Please set the OPENAI_API_KEY environment variable by running: `os.environ['OPENAI_API_KEY'] = 'your_key'`")
     
     # Preprocesses input dataframe
     def preprocess_df(self, df):
@@ -187,7 +184,7 @@ class lloom:
         est_cost["distill_summarize"] = calc_cost_by_tokens(self.distill_model_name, summ_in_tokens, summ_out_tokens)
 
         # Cluster: embed each bullet point
-        cluster_rate = EMBED_COSTS[self.embed_model_name] 
+        cluster_rate = 0.00010/1000
         cluster_tokens = bullets_tokens_per_doc * len(self.in_df) * cluster_rate
         est_cost["cluster"] = (cluster_tokens, 0)
 
@@ -345,15 +342,6 @@ class lloom:
                 if prompt is not None:
                     self.validate_prompt(step_name, prompt)
         
-        # Run cost estimation
-        self.estimate_gen_cost(params)
-        
-        # Confirm to proceed
-        print(f"\n\n{self.bold_highlight_txt('Action required')}")
-        user_input = input("Proceed with generation? (y/n): ")
-        if user_input.lower() != "y":
-            print("Cancelled generation")
-            return
 
         # Run concept generation
         filter_n_quotes = params["filter_n_quotes"]
@@ -540,15 +528,6 @@ class lloom:
         if ignore_existing:
             concepts = {c_id: c for c_id, c in concepts.items() if c_id not in self.results}
         
-        # Run cost estimation
-        self.estimate_score_cost(n_concepts=len(concepts), batch_size=batch_size, get_highlights=get_highlights)
-
-        # Confirm to proceed
-        print(f"\n\n{self.bold_highlight_txt('Action required')}")
-        user_input = input("Proceed with scoring? (y/n): ")
-        if user_input.lower() != "y":
-            print("Cancelled scoring")
-            return
 
         # Run usual scoring; results are stored to self.results within the function
         score_df = await score_concepts(

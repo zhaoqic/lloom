@@ -66,9 +66,9 @@ LLooM is a **concept induction** algorithm that extracts and applies concepts to
 ## Get Started
 Follow the [**Get Started**](https://stanfordhci.github.io/lloom/about/get-started) instructions on our documentation for a walkthrough of the main LLooM functions to run on your own dataset. We suggest starting with this [template Colab Notebook](https://colab.research.google.com/github/michelle123lam/lloom/blob/main/docs/public/nb/24_04_LLooM_GettingStartedTemplate_v2.ipynb).
 
-This will involve downloading our Python package, available on PyPI as [`text_lloom`](https://pypi.org/project/text_lloom/). We recommend setting up a virtual environment with [venv](https://docs.python.org/3/library/venv.html#creating-virtual-environments) or [conda](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-with-commands).
+Install the package in editable mode:
 ```sh
-pip install text_lloom
+pip install -e ./src/txt_lloom
 ```
 
 ## Contact

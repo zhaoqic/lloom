@@ -192,7 +192,6 @@ async def distill_filter(text_df, doc_col, doc_id_col, model_name, n_quotes=3, p
             rows.append([ex_id, cur_filtered])
     quote_df = pd.DataFrame(rows, columns=[doc_id_col, doc_col])
     
-    save_progress(sess, quote_df, step_name="Distill-filter", start=start, res=res_full, model_name=model_name)
     return quote_df
 
 
@@ -251,7 +250,6 @@ async def distill_summarize(text_df, doc_col, doc_id_col, model_name, n_bullets=
                 rows.append([ex_id, bullet])
     bullet_df = pd.DataFrame(rows, columns=[doc_id_col, doc_col])
 
-    save_progress(sess, bullet_df, step_name="Distill-summarize", start=start, res=res_full, model_name=model_name)
     return bullet_df
 
 

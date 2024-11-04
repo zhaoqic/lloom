@@ -19,13 +19,14 @@ import tiktoken
 import openai
 from openai import OpenAI, AsyncOpenAI
 
-if "OPENAI_API_KEY" not in os.environ:
-    raise Exception("API key not found. Please set the OPENAI_API_KEY environment variable by running: `os.environ['OPENAI_API_KEY'] = 'your_key'`")
+
 client = AsyncOpenAI(
-    api_key=os.environ.get("OPENAI_API_KEY"),
+    base_url='http://localhost:11434/v1',
+    api_key='ollama',
 )
 embed_client = OpenAI(
-    api_key=os.environ.get("OPENAI_API_KEY"),
+    base_url='http://localhost:11434/v1',
+    api_key='ollama',
 )
 
 # CONSTANTS ================================
@@ -38,7 +39,8 @@ RATE_LIMITS = {
     "gpt-4": (20, 10),  # = 20*6 = 120 rpm
     "gpt-4-turbo-preview": (20, 10),  # = 20*6 = 120 rpm
     "gpt-4-turbo": (20, 10),  # = 20*6 = 120 rpm
-    "gpt-4o": (20, 10)  # = 20*6 = 120 rpm
+    "gpt-4o": (20, 10),  # = 20*6 = 120 rpm
+    "llama3.1": (20, 10),  # = 20*6 = 120 rpm
 }
 
 CONTEXT_WINDOW = {
@@ -174,8 +176,8 @@ def get_prompt_hash(p):
 
 def truncate_prompt(prompt, model_name, out_token_alloc):
     # Truncate a prompt to fit within a maximum number of tokens
-    max_tokens = CONTEXT_WINDOW[model_name] - out_token_alloc
-    prompt, n_tokens = truncate_text_tokens(prompt, model_name, max_tokens)
+    # max_tokens = CONTEXT_WINDOW[model_name] - out_token_alloc
+    # prompt, n_tokens = truncate_text_tokens(prompt, model_name, max_tokens)
     return prompt
 
 # Internal function making calls to LLM; runs a single LLM query
@@ -242,7 +244,7 @@ def get_embeddings(embed_model_name, text_vals):
 
     # Avoid hitting maximum embedding length.
     num_texts = len(text_vals_mod)
-    chunk_size = EMBED_MAX_BATCH_SIZE[embed_model_name]
+    chunk_size = 2048
     chunked_text_vals = np.array_split(text_vals_mod, np.arange(
         chunk_size, num_texts, chunk_size))
     embeddings = []
